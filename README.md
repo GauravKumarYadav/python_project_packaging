@@ -49,7 +49,7 @@ Before you get started, ensure you have the following prerequisites:
 To run the FastAPI application, execute the following command:
 
 ```bash
-poetry run uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
+poetry run uvicorn src.fastapiproject.app:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 You can access the API at http://localhost:8000. Make sure to modify the host and port as needed.
