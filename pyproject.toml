@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "fastapiproject"
+version = "0.1.0"
+description = "fastApi project to insert data into hive table"
+authors = ["Gaurav Kumar Yadav <gauravy60@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.103.1"
+uvicorn = "^0.23.2"
+pydantic = "^2.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
