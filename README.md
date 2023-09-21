@@ -8,7 +8,6 @@
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
-- [API Endpoints](#api-endpoints)
 - [Testing](#testing)
 - [Contributing](#contributing)
 
@@ -29,7 +28,7 @@ Before you get started, ensure you have the following prerequisites:
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/fastapiproject.git
+   git clone https://github.com/GauravKumarYadav/python_project_packaging.git
    ```
 
 2. Change to the project directory:
@@ -53,22 +52,6 @@ poetry run uvicorn src.fastapiproject.app:app --host 0.0.0.0 --port 8000 --reloa
 ```
 
 You can access the API at http://localhost:8000. Make sure to modify the host and port as needed.
-
-## API Endpoints
-
-The FastAPI project provides the following API endpoints:
-
-- **POST /insert_into**: Insert data into the Hive table. You can send a JSON payload with the data to be inserted.
-
-Example request:
-
-```bash
-{
-    "data": "your_data_here"
-}
-```
-
-- **GET /status**: Check the status of the FastAPI server.
 
 ## Testing
 
