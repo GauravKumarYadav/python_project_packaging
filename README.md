@@ -11,7 +11,6 @@
 - [API Endpoints](#api-endpoints)
 - [Testing](#testing)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Overview
 
@@ -59,7 +58,7 @@ You can access the API at http://localhost:8000. Make sure to modify the host an
 
 The FastAPI project provides the following API endpoints:
 
-- **POST /insert-data**: Insert data into the Hive table. You can send a JSON payload with the data to be inserted.
+- **POST /insert_into**: Insert data into the Hive table. You can send a JSON payload with the data to be inserted.
 
 Example request:
 
