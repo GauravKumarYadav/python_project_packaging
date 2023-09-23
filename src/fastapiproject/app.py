@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import subprocess
 
@@ -17,24 +17,54 @@ def read_root():
 
 
 @app.get("/get_from_hive")
-def read_hive():
+def read_hive(output_limit: int = 10):
     '''
     Reads data from hive using subprocess
     :return:
     the output of the hive query
     '''
-    output = subprocess.call(
-        "hive -e 'select * from test.fastapi_table'", shell=True)
-    print(output)
-    return {"message": "Data read from Hive successfully", "data": output}
+    try:
+
+        output = subprocess.check_output(
+            f"hive -e 'select * from test.fastapi_table LIMIT {output_limit}'", shell=True)
+        output_str = output.decode('utf-8')
+        output_list = []
+        for line in output_str.splitlines():
+            age, name, email = line.split('\t')
+            output_list.append({
+                'age': age,
+                'name': name,
+                'email': email
+            })
+
+        print(output_list)
+        return {"message": "", "data": output_list, "status": 200, "size": len(output_list)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/post_into_hive")
 def insert_into(payload: CustomModel):
-    data1 = payload.name
-    data2 = payload.age
-    data3 = payload.email
+    try:
+        data1 = payload.name
+        data2 = payload.age
+        data3 = payload.email
 
-    print(payload)
-#    subprocess.call("hive -e 'insert into test.fastapi_table values (\"{}\", {}, \"{}\")'".format(data1, data2, data3),shell=True)
-    return {"message": "Data written to Hive successfully"}
+        print(payload)
+        subprocess.check_output(
+            "hive -e 'insert into test.fastapi_table values (\"{}\", {}, \"{}\")'".format(data1, data2, data3), shell=True)
+
+        output = subprocess.check_output(
+            f"hive -e 'select * from test.fastapi_table where name=\"{data1}\" and age={data2} and email=\"{data3}\"'", shell=True)
+
+        output_str = output.decode('utf-8')
+
+        for line in output_str.splitlines():
+            age, name, email = line.split('\t')
+            if age == data2 and name == data1 and email == data3:
+                return {"message": "Data written to Hive successfully"}
+
+        raise HTTPException(
+            status_code=500, detail="Data not inserted in Hive")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
