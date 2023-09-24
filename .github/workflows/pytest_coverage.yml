@@ -1,0 +1,28 @@
+name: Run Pytest and Check Coverage
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python and Poetry
+        uses: poetry/actions/setup-python@v2
+        with:
+          python-version: 3.8  # Change to your desired Python version
+
+      - name: Install project dependencies
+        run: poetry install
+
+      - name: Run Pytest and Calculate Coverage
+        run: poetry run pytest --cov=src tests/
+
+      - name: Check Coverage
+        run: poetry run coverage report -m --fail-under=80  # Adjust the coverage threshold as needed
