@@ -3,7 +3,7 @@ name: Run Pytest and Check Coverage
 on:
   push:
     branches:
-      - main  # Change this to your default branch name
+      - main # Change this to your default branch name
 
 jobs:
   build:
@@ -16,13 +16,17 @@ jobs:
       - name: Set up Python and Poetry
         uses: poetry/actions/setup-python@v2
         with:
-          python-version: 3.8  # Change to your desired Python version
+          python-version: 3.8 # Change to your desired Python version
 
-      - name: Install project dependencies
-        run: poetry install
+      - name: Install tox
+        run: pip install tox
 
-      - name: Run Pytest and Calculate Coverage
-        run: poetry run pytest --cov=src tests/
+      - name: Run Tox
+        run: tox
 
-      - name: Check Coverage
-        run: poetry run coverage report -m --fail-under=80  # Adjust the coverage threshold as needed
+      - name: Archive HTML Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report
+          path: src/htmlcov
