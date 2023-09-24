@@ -5,3 +5,10 @@ dist
 .tox
 __pycache__
 */__pycache__
+*/__pycache__/*
+htmlcov
+*.egg-info
+*.egg
+*.log
+*.pyc
+*.cpython*
