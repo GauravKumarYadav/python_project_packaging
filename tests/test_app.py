@@ -4,6 +4,7 @@ from fastapiproject.app import app, CustomModel
 
 client = TestClient(app)
 
+subprocess_mock = MagicMock()
 
 def test_read_root():
     response = client.get("/")
@@ -32,6 +33,20 @@ def test_read_hive_error(subprocess_mock):
     response = client.get("/get_from_hive")
     assert response.status_code == 500
 
+@patch("fastapiproject.app.subprocess")
+def test_insert_into_hive(subprocess_mock):
+    subprocess_mock.check_output.side_effect = [b'',b"TestUser\t30\ttest@email.com\n"]
+    payload = {
+        "name": "TestUser",
+        "age": 30,
+        "email": "test@email.com"
+    }
+    response = client.post("/post_into_hive", json=payload)
+    assert subprocess_mock.check_output.call_count == 2
+    print(response.json())
+    assert response.json() == {"message": "Data written to Hive successfully"}
+    assert response.status_code == 200
+
 
 @patch("fastapiproject.app.subprocess")
 def test_insert_into_error(subprocess_mock):
@@ -42,4 +57,5 @@ def test_insert_into_error(subprocess_mock):
         "email": "test@example.com"
     }
     response = client.post("/post_into_hive", json=payload)
+    print(response.json())
     assert response.status_code == 500

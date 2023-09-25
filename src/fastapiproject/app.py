@@ -12,12 +12,12 @@ class CustomModel(BaseModel):
 
 
 @app.get("/")
-def read_root():
+async def read_root():
     return {"Hello": "World"}
 
 
 @app.get("/get_from_hive")
-def read_hive(output_limit: int = 10):
+async def read_hive(output_limit: int = 10):
     '''
     Reads data from hive using subprocess
     :return:
@@ -44,7 +44,7 @@ def read_hive(output_limit: int = 10):
 
 
 @app.post("/post_into_hive")
-def insert_into(payload: CustomModel):
+async def insert_into(payload: CustomModel):
     try:
         data1 = payload.name
         data2 = payload.age
@@ -59,13 +59,15 @@ def insert_into(payload: CustomModel):
                 status_code=500, detail="Data not inserted in Hive")
 
         output = subprocess.check_output(
-            f"hive -e 'select * from test.fastapi_table where name=\"{data1}\" and age={data2} and email=\"{data3}\"'", shell=True)
+            "hive -e 'select * from test.fastapi_table where name=\"{}\" and age={} and email=\"{}\" LIMIT 1'".format(data1, data2, data3), shell=True)
 
         output_str = output.decode('utf-8')
+        print(output_str)
 
         for line in output_str.splitlines():
-            age, name, email = line.split('\t')
-            if age == data2 and name == data1 and email == data3:
+            name, age, email = line.split('\t')
+            if int(age) == data2 and name == data1 and email == data3:
+                print("Data written to Hive successfully")
                 return {"message": "Data written to Hive successfully"}
 
         raise HTTPException(
