@@ -51,8 +51,12 @@ def insert_into(payload: CustomModel):
         data3 = payload.email
 
         print(payload)
-        subprocess.check_output(
-            "hive -e 'insert into test.fastapi_table values (\"{}\", {}, \"{}\")'".format(data1, data2, data3), shell=True)
+        try:
+            subprocess.check_output(
+                "hive -e 'insert into test.fastapi_table values (\"{}\", {}, \"{}\")'".format(data1, data2, data3), shell=True)
+        except subprocess.CalledProcessError as e:
+            raise HTTPException(
+                status_code=500, detail="Data not inserted in Hive")
 
         output = subprocess.check_output(
             f"hive -e 'select * from test.fastapi_table where name=\"{data1}\" and age={data2} and email=\"{data3}\"'", shell=True)

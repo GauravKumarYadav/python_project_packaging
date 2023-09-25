@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-from fastapiproject.app import app  # Adjust the import path as needed
+from unittest.mock import patch, MagicMock
+from fastapiproject.app import app, CustomModel
 
 client = TestClient(app)
 
@@ -10,24 +11,35 @@ def test_read_root():
     assert response.json() == {"Hello": "World"}
 
 
-def test_read_hive():
+@patch("fastapiproject.app.subprocess")
+def test_read_hive(subprocess_mock):
+    subprocess_mock.check_output.return_value = b"30\tTestUser\ttest@example.com\n"
     response = client.get("/get_from_hive")
-    if 'message' in response.json() and 'data' in response.json():
-        assert response.status_code == 200
-    else:
-        assert response.status_code == 500
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == 200
+    assert data["size"] == 1
+    assert data["data"][0] == {
+        'age': '30',
+        'name': 'TestUser',
+        'email': 'test@example.com'
+    }
 
 
-def test_insert_into_hive():
+@patch("fastapiproject.app.subprocess")
+def test_read_hive_error(subprocess_mock):
+    subprocess_mock.check_output.side_effect = Exception("Hive error")
+    response = client.get("/get_from_hive")
+    assert response.status_code == 500
+
+
+@patch("fastapiproject.app.subprocess")
+def test_insert_into_error(subprocess_mock):
+    subprocess_mock.check_output.side_effect = Exception("Hive error")
     payload = {
-        "name": "John",
+        "name": "TestUser",
         "age": 30,
-        "email": "john@example.com"
+        "email": "test@example.com"
     }
     response = client.post("/post_into_hive", json=payload)
-    if 'message' in response.json():
-        assert response.status_code == 200
-        assert response.json()[
-            "message"] == "Data written to Hive successfully"
-    else:
-        assert response.status_code == 500
+    assert response.status_code == 500
